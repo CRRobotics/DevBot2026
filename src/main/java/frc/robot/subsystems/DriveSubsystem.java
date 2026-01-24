@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -24,7 +25,9 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
@@ -36,6 +39,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class DriveSubsystem extends SubsystemBase {
   private final Field2d field;
   Vision vision = new Vision();
+  double lastVisionLog;
   // Create MAXSwerveModules
   private final MAXSwerveModule m_frontLeft = new MAXSwerveModule(
       DriveConstants.kFrontLeftDrivingCanId,
@@ -131,7 +135,6 @@ public class DriveSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    List<VisionPose> poseReports = vision.getAprilTagResultsPhotonPose();
     // Update the odometry in the periodic block
     m_odometry.update(
         Rotation2d.fromDegrees(m_gyro.getAngle()* (DriveConstants.kGyroReversed ? -1.0 : 1.0)),
@@ -141,6 +144,23 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    // Log AprilTag pose estimates
+    double LOGTHROTTLE = 0.5;       // Throttle print interval
+    double curtime = Timer.getFPGATimestamp();
+
+    if (curtime - lastVisionLog >= LOGTHROTTLE) {
+        lastVisionLog = curtime;
+        VisionPose[] recentPoses = vision.getRecentResults();
+
+        for (int i = 0; i < recentPoses.length; i++) {
+            if (recentPoses[i] != null) {
+                logPoseAtTimestamp("Camera ID " + i, recentPoses[i], recentPoses[i].getTimestamp());
+            }
+        }
+    }
+
+    List<VisionPose> poseReports = vision.getAprilTagResultsPhotonPose();
     for(VisionPose visPose : poseReports){
             poseEstimator.addVisionMeasurement(visPose.getPose(), visPose.getTimestamp());
         }
@@ -188,6 +208,20 @@ public class DriveSubsystem extends SubsystemBase {
         pose);
     poseEstimator.resetPose(pose);
   }
+
+    /**
+     * Logs the estimated pose of the robot based on the camera and Kalman filter at a given timestamp.
+     * 
+     * @param cameraName The name of the camera.
+     * @param cameraPose The estimated pose based on a camera.
+     * @param timestampSeconds The timestamp in seconds.
+     */
+    public void logPoseAtTimestamp(String cameraName, VisionPose cameraPose, double timestampSeconds) {
+        Optional<Pose2d> poseOptional = poseEstimator.sampleAt(timestampSeconds);
+        if (poseOptional.isPresent()) {
+            DataLogManager.log(cameraName + ": " + cameraPose + ", Actual pose: " + poseOptional.get());
+        }
+    }
 
   /**
    * Method to drive the robot using joystick info.
