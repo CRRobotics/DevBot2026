@@ -155,15 +155,17 @@ public class DriveSubsystem extends SubsystemBase {
         m_rearRight.getPosition()
         }
     );
-    if (poseReports.size() > 0) {
+    /*if (poseReports.size() > 0) {
       SmartDashboard.putNumber("PhotonVision X", poseReports.get(0).getPose().getX());
       SmartDashboard.putNumber("PhotonVision Y", poseReports.get(0).getPose().getY());
       SmartDashboard.putNumber("PhotonVision Theta", poseReports.get(0).getPose().getRotation().getDegrees());
-    }
+    }*/
     SmartDashboard.putNumber("PhotonVisionStringSize",poseReports.size());
     SmartDashboard.putNumber("Gyro Angle", m_gyro.getAngle()* (DriveConstants.kGyroReversed ? -1.0 : 1.0));
     SmartDashboard.putNumber("Poseestimator Angle", poseEstimator.getEstimatedPosition().getRotation().getDegrees());
     SmartDashboard.putNumber("m_odometry Angle", m_odometry.getPoseMeters().getRotation().getDegrees());
+    SmartDashboard.putNumber("m_odometry X", m_odometry.getPoseMeters().getX());
+    SmartDashboard.putNumber("m_odometry Y", m_odometry.getPoseMeters().getY());
     SmartDashboard.putNumber("Angular Adjustment", m_gyro.getAngleAdjustment());
     SmartDashboard.putData("Field",field);
     field.setRobotPose(poseEstimator.getEstimatedPosition());

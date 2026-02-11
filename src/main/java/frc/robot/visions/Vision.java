@@ -41,10 +41,11 @@ public class Vision {
      */
     public Vision() {
         cameras = new AprilCamera[] {
-            new AprilCamera("CamNull", -0.311, -0.311, 0, -Math.PI/12, Math.PI, 0),
+            new AprilCamera("Cam2", -0.311, -0.311, 0, -Math.PI/12, Math.PI, 0),
+            new AprilCamera("ArduCam", -0.311, 0.311, 0, -Math.PI/12, Math.PI, 0)
             //new AprilCamera("Cam2", 0, 0, 0, 0, 0, 0),
             //new AprilCamera("Cam8", 0, 0, 0, 0, 0, 0)
-        }; // THESE TRANSFORMS ARE WRONG
+        };
     }
 
     /**

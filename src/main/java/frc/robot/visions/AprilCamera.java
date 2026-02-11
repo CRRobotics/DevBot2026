@@ -27,6 +27,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.visions.VisionPose;
 
 /**
@@ -93,6 +94,11 @@ public class AprilCamera {
                 Pose3d estimatedPose = estimatedPoseIfPresent.get().estimatedPose;
                 double timestamp = result.getTimestampSeconds();
                 VisionPose toReturn = new VisionPose(estimatedPose, timestamp);
+
+                // Display stuff
+                SmartDashboard.putNumber(name + " X", estimatedPose.getX());
+                SmartDashboard.putNumber(name + " Y", estimatedPose.getY());
+                SmartDashboard.putNumber(name + " Theta", Math.toDegrees(estimatedPose.getRotation().getZ()));
 
                 // Not sure of the time-order of multiple results for the same camera; do we get the oldest
                 // or the newest by just taking the last? Not a big issue, we are polling every 20ms
