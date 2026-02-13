@@ -311,6 +311,11 @@ public class DriveSubsystem extends SubsystemBase {
     System.out.println("driving");
   }
 
+  public Command driveToPose(Supplier<Pose2d> supplier, DriveSubsystem drive) {
+    PathPlannerPath path = new PathPlannerPath(PathPlannerPath.waypointsFromPoses(drive.getPose(),supplier.get()), null, null, null);
+    return AutoBuilder.followPath(path);
+  }
+
   public Command followPathCommand(Supplier<Pose2d> supplier) {
     RobotConfig config;
     try{
