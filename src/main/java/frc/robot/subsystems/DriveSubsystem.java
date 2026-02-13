@@ -5,11 +5,16 @@
 package frc.robot.subsystems;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
@@ -30,8 +35,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.printCommand;
 import frc.robot.visions.Vision;
 import frc.robot.visions.VisionPose;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -176,6 +184,7 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public Pose2d getPose() {
     //return m_odometry.getPoseMeters(); switched to kalman filter
+    System.out.println("got pose");
     return poseEstimator.getEstimatedPosition();
   }
 
@@ -299,5 +308,35 @@ public class DriveSubsystem extends SubsystemBase {
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
     SwerveModuleState[] targetStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(robotRelativeSpeeds);
     this.setModuleStates(targetStates);
+    System.out.println("driving");
   }
+
+  public Command followPathCommand(Supplier<Pose2d> supplier) {
+    RobotConfig config;
+    try{
+        PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
+        config = RobotConfig.fromGUISettings();
+
+        Command pathFind =  new PathfindingCommand(
+                supplier.get(),
+                constraints,
+                this::getPose, // Robot pose supplier
+                this::getCurrentSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> {
+                driveRobotRelative(speeds);
+                }, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds, AND feedforwards
+                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                        new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                ),
+                config, // The robot configuration
+                this // Reference to this subsystem to set requirements
+        );
+        return (new printCommand()).andThen(pathFind).andThen(new printCommand());
+    } catch (Exception e) {
+        DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+        return Commands.none();
+    }
+  }
+
 }

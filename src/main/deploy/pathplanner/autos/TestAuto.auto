@@ -9,6 +9,12 @@
           "data": {
             "pathName": "Forward1Robot"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "testCommand"
+          }
         }
       ]
     }
