@@ -103,9 +103,9 @@ public class RobotContainer {
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
     
-    new JoystickButton(m_driverController, XboxController.Button.kA.value).whileTrue(m_robotDrive.followPathCommand(() -> {
-      return m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)));
-    }));
+    // new JoystickButton(m_driverController, XboxController.Button.kA.value).whileTrue(m_robotDrive.followPathCommand(() -> {
+    //   return m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)));
+    // }));
   }
 
   /**
