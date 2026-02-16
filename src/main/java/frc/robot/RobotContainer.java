@@ -9,8 +9,11 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -24,6 +27,9 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.printCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.KrakenTest;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOPhotonVision;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -44,6 +50,7 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive;
   private final KrakenTest krakenTest;
+  private final Vision vision;
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -59,6 +66,23 @@ public class RobotContainer {
 
     m_robotDrive = new DriveSubsystem();
     krakenTest = new KrakenTest();
+
+    // The following does not make use of best practices, and was inserted to test whether AdvantageKit stuff works
+    Transform3d robotToCam2 = new Transform3d(new Translation3d(-0.311, -0.311, 0), new Rotation3d(Math.PI, -Math.PI/12, 0));
+    Transform3d robotToCam1 = new Transform3d(new Translation3d(-0.311, 0.311, 0), new Rotation3d(Math.PI, -Math.PI/12, 0));
+    if (Constants.isSimulated) { // Whether the robot is running simulated or actual mode
+      vision = new Vision( // These are the AK Vision class
+        m_robotDrive::addVisionMeasurement, // A function that takes in the reported poses and adds them to the Kalman filter
+        new VisionIOPhotonVisionSim("Cam2", robotToCam2, m_robotDrive::getPose),
+        new VisionIOPhotonVisionSim("ArduCam", robotToCam1, m_robotDrive::getPose)
+      );
+    } else {
+      vision = new Vision(
+        m_robotDrive::addVisionMeasurement,
+        new VisionIOPhotonVision("Cam2", robotToCam2),
+        new VisionIOPhotonVision("ArduCam", robotToCam1)
+      );
+    }
 
     // Configure the button bindings
     configureButtonBindings();
