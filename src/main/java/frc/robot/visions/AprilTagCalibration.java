@@ -10,7 +10,7 @@ public class AprilTagCalibration {
                 "translation": {
                     "x": 0.0,
                     "y": 0.7159625,
-                    "z": 0.180975
+                    "z": 0.219075
                 },
                 "rotation": {
                     "quaternion": {
@@ -46,7 +46,7 @@ public class AprilTagCalibration {
                 "translation": {
                     "x": 0.0,
                     "y": 0.9318625,
-                    "z": 0.180975
+                    "z": 0.219075
                 },
                 "rotation": {
                     "quaternion": {

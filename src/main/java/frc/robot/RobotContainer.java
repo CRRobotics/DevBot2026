@@ -68,8 +68,8 @@ public class RobotContainer {
     krakenTest = new KrakenTest();
 
     // The following does not make use of best practices, and was inserted to test whether AdvantageKit stuff works
-    Transform3d robotToCam2 = new Transform3d(new Translation3d(-0.311, -0.311, 0), new Rotation3d(Math.PI, -Math.PI/12, 0));
-    Transform3d robotToCam1 = new Transform3d(new Translation3d(-0.311, 0.311, 0), new Rotation3d(Math.PI, -Math.PI/12, 0));
+    Transform3d robotToCam2 = new Transform3d(new Translation3d(-0.311, -0.3, 0), new Rotation3d(Math.PI, Math.PI/12, Math.PI));
+    Transform3d robotToCam1 = new Transform3d(new Translation3d(-0.311, 0.3, 0), new Rotation3d(0, Math.PI/12, Math.PI));
     if (Constants.isSimulated) { // Whether the robot is running simulated or actual mode
       vision = new Vision( // These are the AK Vision class
         m_robotDrive::addVisionMeasurement, // A function that takes in the reported poses and adds them to the Kalman filter
