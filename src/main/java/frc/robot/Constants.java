@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 
 /**
@@ -26,7 +27,7 @@ public final class Constants {
   public static final class DriveConstants {
     // Driving Parameters - Note that these are not the maximum capable speeds of
     // the robot, rather the allowed maximum speeds
-    public static final double kMaxSpeedMetersPerSecond = 0.2;
+    public static final double kMaxSpeedMetersPerSecond = 0.1;
     public static final double kMaxAngularSpeed = 1.0 * Math.PI; // radians per second
 
     // Chassis configuration
@@ -65,6 +66,27 @@ public final class Constants {
     public static final double stateTheta = 0.5;
     public static final double visionTheta = 0.5;
 
+    // Constants added as a result of the addition of driveToRelative
+    public static final class autoMoveK{
+      public static final double kP = 0;
+      public static final double kI = 0;
+      public static final double kD = 0;
+    }
+
+    public static final class autoTurnK{
+      public static final double kP = 0;
+      public static final double kI = 0;
+      public static final double kD = 0;
+      public static final double iZone = 0;
+    }
+
+    public static double kMaxAngularSpeedRadiansPerSecondSquared = 1;
+
+    public static final Constraints autoMoveConstraints = new TrapezoidProfile.Constraints(
+      kMaxAngularSpeed, kMaxAngularSpeedRadiansPerSecondSquared);
+    public static final Constraints autoTurnConstraints = null;
+    public static final double TOL_TRANSLATION = 0;
+    public static final double TOL_ROTATION = 0;
   }
   
   public static final class ModuleConstants {       
