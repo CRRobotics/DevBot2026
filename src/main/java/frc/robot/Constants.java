@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -67,26 +69,22 @@ public final class Constants {
     public static final double visionTheta = 0.5;
 
     // Constants added as a result of the addition of driveToRelative
-    public static final class autoMoveK{
-      public static final double kP = 0;
-      public static final double kI = 0;
-      public static final double kD = 0;
-    }
 
-    public static final class autoTurnK{
-      public static final double kP = 0;
-      public static final double kI = 0;
-      public static final double kD = 0;
-      public static final double iZone = 0;
-    }
+    public static final PIDConstants autoMoveK = new PIDConstants(1.2,0,0,0);
+    public static final PIDConstants autoTurnK = new PIDConstants(1.1,0,0,Units.degreesToRadians(20));
 
     public static double kMaxAngularSpeedRadiansPerSecondSquared = 1;
 
-    public static final Constraints autoMoveConstraints = new TrapezoidProfile.Constraints(
-      kMaxAngularSpeed, kMaxAngularSpeedRadiansPerSecondSquared);
-    public static final Constraints autoTurnConstraints = null;
-    public static final double TOL_TRANSLATION = 0;
-    public static final double TOL_ROTATION = 0;
+    public static final TrapezoidProfile.Constraints autoMoveConstraints =
+        new TrapezoidProfile.Constraints(2.0, 2.0);
+
+    public static final TrapezoidProfile.Constraints autoTurnConstraints =
+        new TrapezoidProfile.Constraints(Math.PI, Math.PI);
+
+    public static final double TOL_TRANSLATION = 0.055; // 2.5cm target accuracy on auto
+    public static final double TOL_ROTATION = 2.5; // 10 degree rotation accuracy on auto
+    public static final double TOL_MAXREEFDIST = 5.0; // max meters we will traverse to align reef
+    public static final double TOL_MAXSTATIONDIST = 3.0; // max meters we will traverse to align reef
   }
   
   public static final class ModuleConstants {       

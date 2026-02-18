@@ -16,12 +16,14 @@ import frc.robot.subsystems.DriveSubsystem;
 public class driveToRelative extends Command{
     protected final DriveSubsystem driveTrain;
     protected Supplier<Pose2d> targetPose;
+    protected Pose2d tp;
 
     protected final ProfiledPIDController xController;
     protected final ProfiledPIDController yController;
     protected final ProfiledPIDController rotationController;
 
-    public driveToRelative(DriveSubsystem dt) {
+    public driveToRelative(DriveSubsystem dt, Supplier<Pose2d> targetPose) {
+        this.targetPose = targetPose;
         this.driveTrain = dt;
         this.xController =
         new ProfiledPIDController(
@@ -47,11 +49,18 @@ public class driveToRelative extends Command{
         addRequirements(this.driveTrain);
     }
 
-    @Override  
-    public void execute() {
-        if (targetPose == null) return;
+    @Override
+    public void initialize(){
+        tp = targetPose.get();
+    }
 
-        Pose2d tp = targetPose.get();
+    @Override
+    public void execute() {
+        if (targetPose == null) {
+            System.out.println("null target");
+            return;
+        }
+
         Pose2d cp = driveTrain.getPose();
 
         double xFeedback = xController.calculate(cp.getX(), tp.getX());
@@ -77,25 +86,16 @@ public class driveToRelative extends Command{
             rotVel = 0;
         }
 
-        // DataLogManager.log(String.format("AA:     X        Y        Theta"));
-        // DataLogManager.log(
-        //     String.format(
-        //         " err: %4f %4f %4f",
-        //         cp.getX() - tp.getX(),
-        //         cp.getY() - tp.getY(),
-        //         cp.getRotation().getDegrees() - tp.getRotation().getDegrees()));
-        // DataLogManager.log(String.format("calc: %4f %4f %4f", xFeedback, yFeedback, rotFeedback));
-        // DataLogManager.log(String.format("  ff: %4f %4f %4f", xFF, yFF, rotFF));
-        // DataLogManager.log(String.format(" new: %4f %4f %4f", xVel, yVel, rotVel));
-
+        System.out.println(xVel + ", " + yVel + ", " + rotVel);
         driveTrain.drive(xVel, yVel, rotVel,true);
     }
 
     @Override
     public boolean isFinished() {
-        if (targetPose == null) return true;
-
-        Pose2d tp = targetPose.get();
+        if (targetPose == null){
+            System.out.println("null target");
+            return true;
+        }
         Pose2d cp = driveTrain.getPose();
 
         // Curious why 3015 didn't use a cartesian distance here?

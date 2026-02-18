@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.driveToRelative;
 import frc.robot.commands.printCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.KrakenTest;
@@ -103,11 +104,10 @@ public class RobotContainer {
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
     
-    new JoystickButton(m_driverController, XboxController.Button.kA.value).whileTrue(m_robotDrive.followPathCommand(() -> {
-      return m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)));
-    }));
+    new JoystickButton(m_driverController, XboxController.Button.kB.value).onTrue(new driveToRelative(m_robotDrive, () -> m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)))));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value).whileTrue(m_robotDrive.followPathCommand(() -> new Pose2d(2,2,new Rotation2d(Math.PI))));
+    new JoystickButton(m_driverController, XboxController.Button.kX.value).whileTrue(m_robotDrive.followPathCommand(() -> m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)))));
   }
 
   /**
