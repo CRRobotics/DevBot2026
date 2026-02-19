@@ -7,15 +7,18 @@
 
 package frc.robot.subsystems.vision;
 
+import java.io.File;
+import java.io.IOException;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.wpilibj.Filesystem;
 
 public class VisionConstants {
   // AprilTag layout
-  public static AprilTagFieldLayout aprilTagLayout =
-      AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+  public static AprilTagFieldLayout aprilTagLayout = getTheRightLayout(false);
 
   // Camera names, must match names configured on coprocessor
   public static String camera0Name = "camera_0";
@@ -49,4 +52,24 @@ public class VisionConstants {
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
       Double.POSITIVE_INFINITY; // No rotation data available
+  
+  /**
+   * Returns the AprilTag field layout.
+   * @param realField True if you want the actual game field, false if you want a test field
+   * @return A field layout, either for the match or testing
+   */
+  private static AprilTagFieldLayout getTheRightLayout(boolean realField) {
+      if (!realField) {
+          File theFile = new File(Filesystem.getDeployDirectory(), "AprilTagCalibration.json");
+          try {
+              String p = theFile.getAbsolutePath();
+              System.out.print("Found " + p + "\n");
+              return new AprilTagFieldLayout(theFile.getAbsolutePath()); //Calibration apriltag field
+          } catch (IOException e) {
+              System.out.print("Failed to load custom field layout" + e + "\n"); 
+          }
+      }
+
+     return AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField); // Will happen if realField is true or the test field doesn't load
+  }
 }
