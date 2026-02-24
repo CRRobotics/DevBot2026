@@ -20,6 +20,7 @@ import com.studica.frc.AHRS.NavXComType;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -29,6 +30,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -151,9 +154,9 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
-    for(VisionPose visPose : poseReports){
+    /*for(VisionPose visPose : poseReports){
             poseEstimator.addVisionMeasurement(visPose.getPose(), visPose.getTimestamp());
-    }
+    }*/ // We commented this out because we're trying AdvantageKit's vision template
     poseEstimator.update(
         Rotation2d.fromDegrees(m_gyro.getAngle()* (DriveConstants.kGyroReversed ? -1.0 : 1.0)), //#todo make sure gyro is correct
         new SwerveModulePosition[] {
@@ -344,4 +347,15 @@ public class DriveSubsystem extends SubsystemBase {
     }
   }
 
+
+
+
+   /** Adds a new timestamped vision measurement. AdvantageKit stuff. */
+  public void addVisionMeasurement(
+      Pose2d visionRobotPoseMeters,
+      double timestampSeconds,
+      Matrix<N3, N1> visionMeasurementStdDevs) {
+    poseEstimator.addVisionMeasurement(
+        visionRobotPoseMeters, timestampSeconds, visionMeasurementStdDevs);
+  }
 }

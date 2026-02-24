@@ -32,6 +32,11 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
 
+import frc.robot.subsystems.vision.NetworkTableWrapper;
+import frc.robot.subsystems.vision.LimelightPosition;
+
+
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 
@@ -73,7 +78,7 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getLeftY(), OIConstants.kDriveDeadband),
                 -MathUtil.applyDeadband(m_driverController.getLeftX(), OIConstants.kDriveDeadband),
                 -Math.abs(MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband)) * MathUtil.applyDeadband(m_driverController.getRightX(), OIConstants.kDriveDeadband),
-                true),
+                true), 
             m_robotDrive));
 
     // Build an auto chooser. This will use Commands.none() as the default option.
@@ -103,8 +108,18 @@ public class RobotContainer {
         .onTrue(new InstantCommand(
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
-    
-    new JoystickButton(m_driverController, XboxController.Button.kB.value).onTrue(new driveToRelative(m_robotDrive, () -> m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)))));
+
+    double[] pieceData = NetworkTableWrapper.getArray("limelight","llpython");
+    double distance = pieceData[0] * .0254;
+    double angle = pieceData[1];
+
+    double xCoord = distance * Math.cos(Math.toRadians(angle)) + LimelightPosition.xCoord;
+    double yCoord = distance * Math.sin(Math.toRadians(angle)) + LimelightPosition.yCoord;
+
+    Transform2d relativeFuelPosition = new Transform2d(xCoord, yCoord, new Rotation2d(0));
+    System.out.println("RobotContainer relativeFuelPosition: " + relativeFuelPosition);
+
+    new JoystickButton(m_driverController, XboxController.Button.kB.value).onTrue(new driveToRelative(m_robotDrive, () -> m_robotDrive.getPose().plus(relativeFuelPosition)));
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value).whileTrue(m_robotDrive.followPathCommand(() -> new Pose2d(2,2,new Rotation2d(Math.PI))));
     new JoystickButton(m_driverController, XboxController.Button.kX.value).whileTrue(m_robotDrive.followPathCommand(() -> m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)))));

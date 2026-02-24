@@ -24,6 +24,7 @@ public class driveToRelative extends Command{
 
     public driveToRelative(DriveSubsystem dt, Supplier<Pose2d> targetPose) {
         this.targetPose = targetPose;
+        System.out.println("DTR Constructor targetPose: " + targetPose);
         this.driveTrain = dt;
         this.xController =
         new ProfiledPIDController(
@@ -59,6 +60,9 @@ public class driveToRelative extends Command{
         if (targetPose == null) {
             System.out.println("null target");
             return;
+        }
+        else {
+            System.out.println("DTR Execute targetPose: " + targetPose);
         }
 
         Pose2d cp = driveTrain.getPose();
