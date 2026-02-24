@@ -129,6 +129,13 @@ public final class Constants {
 
   }
 
+  public static final class FieldConstants {
+    public static final double redhubX = 0;
+    public static final double redhubY = 0;
+    public static final double bluehubX = 10;
+    public static final double bluehubY = 10;
+  }
+
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final double kDriveDeadband = 0.025;

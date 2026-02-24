@@ -23,6 +23,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.driveToRelative;
 import frc.robot.commands.printCommand;
+import frc.robot.commands.turnToPoint;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.KrakenTest;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -108,6 +109,7 @@ public class RobotContainer {
 
     new JoystickButton(m_driverController, XboxController.Button.kA.value).whileTrue(m_robotDrive.followPathCommand(() -> new Pose2d(2,2,new Rotation2d(Math.PI))));
     new JoystickButton(m_driverController, XboxController.Button.kX.value).whileTrue(m_robotDrive.followPathCommand(() -> m_robotDrive.getPose().plus(new Transform2d(1,0,new Rotation2d(0)))));
+    new JoystickButton(m_driverController, XboxController.Button.kY.value).whileTrue(new turnToPoint(m_robotDrive));
   }
 
   /**
