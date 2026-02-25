@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
@@ -19,7 +18,6 @@ public class turnToPoint extends Command{
     private boolean IsRed;
     protected final ProfiledPIDController rotationController;
     private double angle;
-    private Rotation2d angleTarget;
 
     public turnToPoint(DriveSubsystem dt) {
         this.driveTrain = dt;
@@ -63,23 +61,21 @@ public class turnToPoint extends Command{
         // angle in degrees
         if (IsRed == true){
             angle = Math.atan((FieldConstants.redhubY - cp.getY())/(FieldConstants.redhubX - cp.getX()));
-            angleTarget = new Rotation2d(angle);
         }
         else {
             angle = Math.atan((FieldConstants.bluehubY - cp.getY())/(FieldConstants.bluehubX - cp.getX()));
-            angleTarget = new Rotation2d(angle);
 
         }
 
 
         double rotFeedback = rotationController.calculate(
-                cp.getRotation().getRadians(), new Rotation2d(angle).getRadians());
+                cp.getRotation().getRadians(),angle + Math.PI);
 
         double rotFF = rotationController.getSetpoint().velocity;
 
         double rotVel = rotFF + rotFeedback;
 
-        if (Math.abs(cp.getRotation().minus(angleTarget).getDegrees()) < Constants.DriveConstants.TOL_ROTATION) {
+        if (Math.abs(cp.getRotation().getDegrees() - (angle  * (180/Math.PI)) + 180) < Constants.DriveConstants.TOL_ROTATION) {
             rotVel = 0;
         }
 
@@ -91,7 +87,6 @@ public class turnToPoint extends Command{
     public boolean isFinished() {
         Pose2d cp = driveTrain.getPose();
 
-        return Math.abs(cp.getRotation().minus(angleTarget)
-                        .getDegrees()) < Constants.DriveConstants.TOL_ROTATION;
+        return Math.abs(cp.getRotation().getDegrees() - (angle  * (180/Math.PI) + 180)) < Constants.DriveConstants.TOL_ROTATION;
     }
 }
